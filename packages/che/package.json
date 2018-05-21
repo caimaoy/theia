@@ -5,7 +5,8 @@
   "dependencies": {
     "@theia/core": "^0.3.10",
     "@theia/task": "^0.3.10",
-    "@theia/variable-resolver": "^0.3.10"
+    "@theia/variable-resolver": "^0.3.10",
+    "@types/reconnectingwebsocket": "1.0.1"
   },
   "publishConfig": {
     "access": "public"

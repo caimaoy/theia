@@ -18,8 +18,6 @@ import * as path from 'path';
 @injectable()
 export class RawOrTerminalTaskRunner implements TaskRunner {
 
-    type = 'raw'; // TODO: terminal
-
     @inject(ILogger) @named('task')
     protected readonly logger: ILogger;
 

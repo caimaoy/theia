@@ -16,6 +16,6 @@ export class CheTaskRunnerContribution implements TaskRunnerContribution {
     protected readonly cheRunner: CheTaskRunner;
 
     registerRunner(runners: TaskRunnerRegistry): void {
-        runners.registerRunner(this.cheRunner);
+        runners.registerRunner('che', this.cheRunner);
     }
 }

@@ -25,10 +25,10 @@ export class TaskRunnerRegistryImpl implements TaskRunnerRegistry {
         this.setDefaultRunner(this.processRunner);
     }
 
-    registerRunner(runner: TaskRunner): Disposable {
-        this.runners.set(runner.type, runner);
+    registerRunner(type: string, runner: TaskRunner): Disposable {
+        this.runners.set(type, runner);
         return {
-            dispose: () => this.runners.delete(runner.type)
+            dispose: () => this.runners.delete(type)
         };
     }
 

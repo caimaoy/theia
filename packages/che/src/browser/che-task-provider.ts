@@ -17,10 +17,10 @@ export class CheTaskProvider implements TaskProvider {
             type: 'che',
             label: 'Build (detected)',
             target: {
-                workspaceId: 'ws-id',
-                machineName: 'build-machine'
+                workspaceId: 'workspaceg869agykxn5vla7t',
+                machineName: 'theia'
             },
-            command: 'mvn clean install'
+            command: 'ls'
         };
 
         const tasks: CheTaskConfiguration[] = [];

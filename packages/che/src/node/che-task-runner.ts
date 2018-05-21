@@ -5,53 +5,44 @@
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable, inject, named } from 'inversify';
-import { ILogger } from '@theia/core';
+import { injectable, inject } from 'inversify';
 import { Task, TaskRunner } from '@theia/task/lib/common';
+import { TaskManager } from '@theia/task/lib/node/task-manager';
+import { CheTask } from './che-task';
+import { ExecCreateClient, ExecAttachClientFactory } from './machine-exec-client';
 import { CheTaskConfiguration } from '../common/task-protocol';
-
-export interface MachineIdentifier {
-    machineName: string,
-    workspaceId: string
-}
-export interface MachineExec {
-    identifier: MachineIdentifier,
-    cmd: string[],
-    tty: boolean,
-    cols: number,
-    rows: number,
-    id?: number
-}
-export interface MachineExecClient {
-    run(exec: MachineExec): Promise<number>;
-}
 
 @injectable()
 export class CheTaskRunner implements TaskRunner {
 
-    protected readonly machineExecClient: MachineExecClient;
+    @inject(ExecCreateClient)
+    protected readonly execCreateClient: ExecCreateClient;
 
-    type = 'che';
+    @inject(ExecAttachClientFactory)
+    protected readonly execAttachClientFactory: ExecAttachClientFactory;
 
-    @inject(ILogger) @named('task')
-    protected readonly logger: ILogger;
+    @inject(TaskManager)
+    protected readonly taskManager: TaskManager;
 
     async run(task: CheTaskConfiguration, ctx?: string): Promise<Task> {
-        this.logger.error(`Running Che Task`);
+        const machineExec = {
+            identifier: {
+                machineName: task.target.machineName,
+                workspaceId: task.target.workspaceId
+            },
+            cmd: ['sh', '-c', task.command],
+            tty: false
+        };
 
-        // const machineExec = {
-        //     identifier: {
-        //         machineName: task.target,
-        //         workspaceId: task.target
-        //     },
-        //     cmd: [task.command],
-        //     cols: 80,
-        //     rows: 80,
-        //     tty: true
-        // };
+        try {
+            const execId = await this.execCreateClient.create(machineExec);
+            const execAttachClient = this.execAttachClientFactory.create(execId);
+            execAttachClient.attach();
+            console.log('Executed Che command: ' + execId);
+        } catch (err) {
+            console.error('Failed to execute Che command: ' + err);
+        }
 
-        // this.terminalId = await this.machineExecClient.run(machineExec);
-
-        return Promise.reject(new Error(`Che Task Runner isn't implemented`));
+        return new CheTask(this.taskManager, task.label, ctx);
     }
 }

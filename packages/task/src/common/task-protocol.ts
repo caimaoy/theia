@@ -59,12 +59,6 @@ export interface TaskInfo {
     taskId: number,
     /** terminal id. Defined if task is run as a terminal process */
     terminalId?: number,
-    /** internal unique process id */
-    processId?: number,
-    /** OS PID of the process running the task */
-    osProcessId: number,
-    /** The command used to start this task */
-    command: string,
     /** task label */
     label: string,
     /** context that was passed as part of task creation, if any */
@@ -126,12 +120,11 @@ export interface TaskRunnerContribution {
 }
 export const TaskRunner = Symbol('TaskRunner');
 export interface TaskRunner {
-    type: string;
     run(options: TaskConfiguration, ctx?: string): Promise<Task>;
 }
 export const TaskRunnerRegistry = Symbol('TaskRunnerRegistry');
 export interface TaskRunnerRegistry {
-    registerRunner(runner: TaskRunner): Disposable;
+    registerRunner(type: string, runner: TaskRunner): Disposable;
     getRunner(type: string): TaskRunner | undefined;
 }
 export interface Task {

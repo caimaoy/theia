@@ -30,6 +30,6 @@ export class TaskBackendContribution implements BackendApplicationContribution, 
     }
 
     registerRunner(runners: TaskRunnerRegistry): void {
-        runners.registerRunner(this.processRunner);
+        runners.registerRunner('raw', this.processRunner);
     }
 }

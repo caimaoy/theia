@@ -154,7 +154,7 @@ export class TaskService implements TaskConfigurationClient {
             return;
         }
 
-        this.logger.debug(`Task created. task id: ${taskInfo.taskId}, OS ProcessId: ${taskInfo.osProcessId} `);
+        this.logger.debug(`Task created. Task id: ${taskInfo.taskId}`);
 
         // open terminal widget if the task is based on a terminal process:
         if (taskInfo.terminalId !== undefined) {

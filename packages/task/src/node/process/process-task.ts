@@ -54,17 +54,10 @@ export class ProcessTask extends AbstractTask {
     getRuntimeInfo(): TaskInfo {
         return {
             taskId: this.id,
-            osProcessId: this.process.pid,
             terminalId: (this.processType === 'terminal') ? this.process.id : undefined,
-            processId: (this.processType === 'raw') ? this.process.id : undefined,
-            command: this.command,
             label: this.label,
             ctx: this.context
         };
-    }
-
-    get command() {
-        return this.options.command;
     }
     get process() {
         return this.options.process;
