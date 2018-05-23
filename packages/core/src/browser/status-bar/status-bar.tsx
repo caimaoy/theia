@@ -10,9 +10,7 @@ import { LabelParser, LabelIcon } from '../label-parser';
 import { injectable, inject } from 'inversify';
 import { FrontendApplicationStateService } from '../frontend-application-state';
 import { ReactWidget } from '../widgets/react-widget';
-import { StatusBarView } from './status-bar-view';
 import * as React from "react";
-import { StatusBarElements } from './status-bar-elements';
 
 export interface StatusBarLayoutData {
     entries: StatusBarEntryData[]
@@ -128,7 +126,7 @@ export class StatusBarImpl extends ReactWidget implements StatusBar {
         this.internalSetBackgroundColor(data.backgroundColor);
     }
 
-    protected render(): JSX.Element {
+    protected render(): JSX.Element[] {
         const leftEntries: JSX.Element[] = [];
         const rightEntries: JSX.Element[] = [];
         const elements = Array.from(this.entries.values()).sort((left, right) => {
@@ -143,10 +141,10 @@ export class StatusBarImpl extends ReactWidget implements StatusBar {
                 rightEntries.push(this.renderElement(entry));
             }
         });
-        const leftElements: React.ReactElement<StatusBarElements> = <StatusBarElements key="statusbar-left-elements" alignment="left" entries={leftEntries} />;
-        const rightElements: React.ReactElement<StatusBarElements> = <StatusBarElements key="statusbar-right-elements" alignment="right" entries={rightEntries} />;
+        const leftElements = <div className="area left"><React.Fragment>{leftEntries}</React.Fragment></div>;
+        const rightElements = <div className="area right"><React.Fragment>{rightEntries}</React.Fragment></div>;
 
-        return <StatusBarView leftElements={leftElements} rightElements={rightElements} />;
+        return [leftElements, rightElements];
     }
 
     protected createAttributes(entry: StatusBarEntry): StatusBarEntryAttributes {

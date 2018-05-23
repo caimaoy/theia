@@ -6,19 +6,29 @@
  */
 
 import * as ReactDOM from "react-dom";
+import * as React from "react";
 import { injectable } from "inversify";
-import { DisposableCollection } from "../../common";
+import { DisposableCollection, Disposable, MaybeArray } from "../../common";
 import { BaseWidget, Message } from "./widget";
 import { ReactElement } from "react";
 
 @injectable()
-export class ReactWidget extends BaseWidget {
+export abstract class ReactWidget extends BaseWidget {
 
     protected readonly onRender = new DisposableCollection();
     protected childContainer?: HTMLElement;
     protected scrollOptions = {
         suppressScrollX: true
     };
+
+    constructor() {
+        super();
+        this.toDispose.push(Disposable.create(() => {
+            if (this.childContainer) {
+                ReactDOM.unmountComponentAtNode(this.childContainer);
+            }
+        }));
+    }
 
     protected onUpdateRequest(msg: Message): void {
         super.onUpdateRequest(msg);
@@ -32,17 +42,13 @@ export class ReactWidget extends BaseWidget {
                 this.childContainer = this.node;
             }
         }
-        ReactDOM.render(child, this.childContainer);
-        this.onRender.dispose();
+
+        const widget = <React.Fragment>{child}</React.Fragment>;
+
+        ReactDOM.render(widget, this.childContainer, () => this.onRender.dispose());
     }
 
-    protected render(): ReactElement<any> {
-        return {
-            key: null,
-            props: undefined,
-            type: "span"
-        };
-    }
+    protected abstract render(): MaybeArray<ReactElement<any>>;
 
     protected createChildContainer(): HTMLElement {
         return document.createElement('div');
