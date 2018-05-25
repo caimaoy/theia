@@ -35,7 +35,7 @@ export class ExecAttachClientFactory {
     private apiEndPoint: string;
 
     constructor(@inject(WebSocketConnectionProvider) protected readonly connProvider: WebSocketConnectionProvider) {
-        this.apiEndPoint = 'ws://172.17.0.1:32782/attach/';
+        this.apiEndPoint = 'ws://172.17.0.1:32772/attach/';
     }
 
     create(id: number): ExecAttachClient {

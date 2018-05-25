@@ -13,7 +13,7 @@ export class CheTask implements Task {
     id: number;
     context?: string | undefined;
 
-    constructor(taskManager: TaskManager, protected readonly label: string, ctx?: string) {
+    constructor(taskManager: TaskManager, protected readonly label: string, protected readonly execId: number, ctx?: string) {
         this.context = ctx;
         this.id = taskManager.register(this, this.context);
     }
@@ -26,7 +26,8 @@ export class CheTask implements Task {
         return {
             label: this.label,
             taskId: this.id,
-            ctx: this.context
+            ctx: this.context,
+            terminalId: this.execId
         };
     }
 }

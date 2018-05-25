@@ -33,6 +33,12 @@ export class ProcessTask extends AbstractTask {
         @inject(ProcessManager) protected readonly processManager: ProcessManager
     ) {
         super(taskManager, logger, options);
+
+        const toDispose =
+            this.process.onExit(event => {
+                this.taskManager.delete(this);
+                toDispose.dispose();
+            });
     }
 
     /** terminates the task */

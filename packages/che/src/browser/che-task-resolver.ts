@@ -8,7 +8,7 @@
 import { injectable, inject } from 'inversify';
 import { TaskResolver } from '@theia/task/lib/common';
 import { VariableResolverService } from '@theia/variable-resolver/lib/browser';
-import { CheTaskConfiguration } from '../common/task-protocol';
+import { CheTaskConfiguration, Target } from '../common/task-protocol';
 
 @injectable()
 export class CheTaskResolver implements TaskResolver {
@@ -17,12 +17,30 @@ export class CheTaskResolver implements TaskResolver {
     protected readonly variableResolverService: VariableResolverService;
 
     async resolveTask(task: CheTaskConfiguration): Promise<CheTaskConfiguration> {
+        const resultTarget: Target = {};
+
+        if (!task.target) {
+            resultTarget.workspaceId = await this.getWsId();
+            resultTarget.machineName = await this.pickMachine();
+        } else {
+            resultTarget.workspaceId = task.target.workspaceId ? task.target.workspaceId : await this.getWsId();
+            resultTarget.machineName = task.target.machineName ? task.target.machineName : await this.pickMachine();
+        }
+
         const resultTask: CheTaskConfiguration = {
             type: task.type,
             label: task.label,
-            target: task.target,
-            command: await this.variableResolverService.resolve(task.command)
+            command: await this.variableResolverService.resolve(task.command),
+            target: resultTarget
         };
         return resultTask;
+    }
+
+    protected async getWsId(): Promise<string> {
+        return 'workspaceg869agykxn5vla7t';
+    }
+
+    protected async pickMachine(): Promise<string> {
+        return 'theia';
     }
 }

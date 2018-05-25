@@ -20,7 +20,7 @@ export default new ContainerModule(bind => {
     bind(WebSocketConnectionProvider).toSelf().inSingletonScope();
     bind(ExecCreateClient).toDynamicValue(ctx => {
         const provider = ctx.container.get(WebSocketConnectionProvider);
-        return provider.createProxy<ExecCreateClient>('ws://172.17.0.1:32782/connect');
+        return provider.createProxy<ExecCreateClient>('ws://172.17.0.1:32772/connect');
     }).inSingletonScope();
     bind(ExecAttachClientFactory).toSelf().inSingletonScope();
 });

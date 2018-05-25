@@ -33,12 +33,6 @@ export abstract class AbstractTask implements Task {
         @inject(TaskProcessOptions) protected readonly options: TaskProcessOptions
     ) {
         this.taskId = this.taskManager.register(this, this.options.context);
-
-        const toDispose =
-            this.process.onExit(event => {
-                this.taskManager.delete(this);
-                toDispose.dispose();
-            });
         this.logger.info(`Created new task, id: ${this.id}, process id: ${this.options.process.id}, OS PID: ${this.process.pid}, context: ${this.context}`);
     }
 

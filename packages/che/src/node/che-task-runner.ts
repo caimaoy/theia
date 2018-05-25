@@ -31,11 +31,12 @@ export class CheTaskRunner implements TaskRunner {
                 workspaceId: task.target.workspaceId
             },
             cmd: ['sh', '-c', task.command],
-            tty: false
+            tty: true
         };
 
+        let execId = 0;
         try {
-            const execId = await this.execCreateClient.create(machineExec);
+            execId = await this.execCreateClient.create(machineExec);
             const execAttachClient = this.execAttachClientFactory.create(execId);
             execAttachClient.attach();
             console.log('Executed Che command: ' + execId);
@@ -43,6 +44,6 @@ export class CheTaskRunner implements TaskRunner {
             console.error('Failed to execute Che command: ' + err);
         }
 
-        return new CheTask(this.taskManager, task.label, ctx);
+        return new CheTask(this.taskManager, task.label, execId, ctx);
     }
 }

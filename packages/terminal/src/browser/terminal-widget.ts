@@ -11,11 +11,12 @@ import { Disposable, DisposableCollection, ILogger } from '@theia/core/lib/commo
 import { Widget, BaseWidget, Message, WebSocketConnectionProvider, StatefulWidget, isFirefox } from '@theia/core/lib/browser';
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { ShellTerminalServerProxy } from '../common/shell-terminal-protocol';
-import { terminalsPath } from '../common/terminal-protocol';
+// import { terminalsPath } from '../common/terminal-protocol';
 import { IBaseTerminalServer } from '../common/base-terminal-protocol';
 import { TerminalWatcher } from '../common/terminal-watcher';
 import { ThemeService } from "@theia/core/lib/browser/theming";
 import { Deferred } from "@theia/core/lib/common/promise-util";
+// import { TermConnectionProvider } from '@theia/terminal/lib/browser/term-connection-provider';
 
 Xterm.Terminal.applyAddon(require('xterm/lib/addons/fit/fit'));
 
@@ -245,12 +246,13 @@ export class TerminalWidget extends BaseWidget implements StatefulWidget {
         }
     }
     protected async attachTerminal(id: number): Promise<number | undefined> {
-        const terminalId = await this.shellTerminalServer.attach(id);
-        if (IBaseTerminalServer.validateId(terminalId)) {
-            return terminalId;
-        }
-        this.logger.error(`Error attaching to terminal id ${id}, the terminal is most likely gone. Starting up a new terminal instead.`);
-        return this.createTerminal();
+        return id;
+        // const terminalId = await this.shellTerminalServer.attach(id);
+        // if (IBaseTerminalServer.validateId(terminalId)) {
+        // return terminalId;
+        // }
+        // this.logger.error(`Error attaching to terminal id ${id}, the terminal is most likely gone. Starting up a new terminal instead.`);
+        // return this.createTerminal();
     }
     protected async createTerminal(): Promise<number | undefined> {
         const root = await this.workspaceService.root;
@@ -341,19 +343,39 @@ export class TerminalWidget extends BaseWidget implements StatefulWidget {
             return;
         }
         this.toDisposeOnConnect.dispose();
-        this.webSocketConnectionProvider.listen({
-            path: `${terminalsPath}/${this.terminalId}`,
-            onConnection: connection => {
-                connection.onNotification('onData', (data: string) => this.term.write(data));
+        // this.webSocketConnectionProvider.listen({
+        //     path: `${terminalsPath}/${this.terminalId}`,
+        //     onConnection: connection => {
+        //         connection.onNotification('onData', (data: string) => this.term.write(data));
 
-                const sendData = (data?: string) => data && connection.sendRequest('write', data);
-                this.term.on('data', sendData);
-                connection.onDispose(() => this.term.off('data', sendData));
+        //         const sendData = (data?: string) => data && connection.sendRequest('write', data);
+        //         this.term.on('data', sendData);
+        //         connection.onDispose(() => this.term.off('data', sendData));
 
-                this.toDisposeOnConnect.push(connection);
-                connection.listen();
-            }
-        }, { reconnecting: false });
+        //         this.toDisposeOnConnect.push(connection);
+        //         connection.listen();
+        //     }
+        // }, { reconnecting: false });
+
+        const ws = new WebSocket('ws://172.17.0.1:32772/attach/' + this.terminalId);
+        ws.onmessage = ({ data }) => {
+            this.term.write(data);
+        };
+
+        // const termConn = new TermConnectionProvider();
+        // termConn.listen({
+        //     path: `${this.terminalId}`,
+        //     onConnection: connection => {
+        //         connection.onNotification('onData', (data: string) => this.term.write(data));
+
+        //         const sendData = (data?: string) => data && connection.sendRequest('write', data);
+        //         this.term.on('data', sendData);
+        //         connection.onDispose(() => this.term.off('data', sendData));
+
+        //         this.toDisposeOnConnect.push(connection);
+        //         connection.listen();
+        //     }
+        // }, { reconnecting: false });
     }
     protected async reconnectTerminalProcess(): Promise<void> {
         if (typeof this.terminalId === "number") {

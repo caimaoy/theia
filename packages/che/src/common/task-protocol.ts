@@ -8,12 +8,13 @@
 import { TaskConfiguration } from '@theia/task/lib/common';
 
 export interface CheTaskConfiguration extends TaskConfiguration {
-    type: 'che';
-    target: Target;
-    command: string;
+    type: 'che',
+    command: string,
+    target?: Target,
+    previewUrl?: string
 }
 
 export interface Target {
-    workspaceId: string,
-    machineName: string
+    workspaceId?: string,
+    machineName?: string
 }
